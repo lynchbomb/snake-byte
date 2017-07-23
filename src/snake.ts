@@ -1,19 +1,7 @@
-export enum HEADING {
-  'left', 'up', 'right', 'down'
-}
-
-export interface ISnakeOptions {
-  heading?: HEADING;
-  length?: number;
-  origin?: object;
-  fillStyle?: string;
-  lives?: number;
-}
-
-export interface ICoords {
-  x: number;
-  y: number;
-}
+import ICoords from './interfaces/i-coords';
+import ISnakeOptions from './interfaces/i-snake-options';
+import IFood from './interfaces/i-food';
+import { HEADING } from './heading';
 
 export default class Snake {
   heading: HEADING;

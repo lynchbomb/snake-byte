@@ -1,5 +1,5 @@
 import Snake from './snake';
-import ICoords from './snake';
+import ICoords from './interfaces/i-coords';
 
 var app = {
 
@@ -16,7 +16,7 @@ var app = {
   init() {
     this.initCanvas();
     this.initEvents();
-    this.update();
+    // this.update();
     this.snake = new Snake({
       fillStyle: '#222'
     });
@@ -25,7 +25,7 @@ var app = {
   initEvents() {
     const scope = this;
 
-    document.addEventListener('keypress', (e) => {
+    document.onkeydown = function(e) {
       switch (e.keyCode) {
         case 37: scope.handleLeftArrow()
           break;      
@@ -36,7 +36,7 @@ var app = {
         case 40: scope.handleDownArrow()
           break;      
       }
-    });
+    };
   },
 
   handleLeftArrow() {
