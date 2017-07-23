@@ -14,26 +14,34 @@ var app = {
   _didCanvasClear: <boolean> false,
 
   init() {
-    this.initCanvas();
+    this.initCanvas('#000');
     this.initEvents();
-    // this.update();
+    this.update();
     this.snake = new Snake({
       fillStyle: '#222'
     });
   },
 
-  initEvents() {
-    const scope = this;
+  initCanvas(fillStyle: string = '#000') {
+    this.canvasContext = this.$canvas.getContext('2d');
+    this.canvasWidth = this.$canvas.width;
+    this.canvasHeight = this.$canvas.height;
+    this.canvasContext.fillStyle = fillStyle;
+    this.canvasContext.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+  },
 
-    document.onkeydown = function(e) {
+  initEvents() {
+    const SCOPE = this;
+
+    document.onkeydown = (e) => {
       switch (e.keyCode) {
-        case 37: scope.handleLeftArrow()
+        case 37: SCOPE.handleLeftArrow()
           break;      
-        case 38: scope.handleUpArrow()
+        case 38: SCOPE.handleUpArrow()
           break;      
-        case 39: scope.handleRightArrow()
+        case 39: SCOPE.handleRightArrow()
           break;      
-        case 40: scope.handleDownArrow()
+        case 40: SCOPE.handleDownArrow()
           break;      
       }
     };
@@ -53,14 +61,6 @@ var app = {
 
   handleDownArrow() {
     this.snake.heading = 3;
-  },
-
-  initCanvas(fillStyle: string = '#000') {
-    this.canvasContext = this.$canvas.getContext('2d');
-    this.canvasWidth = this.$canvas.width;
-    this.canvasHeight = this.$canvas.height;
-    this.canvasContext.fillStyle = fillStyle;
-    this.canvasContext.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
   },
 
   clearCanvas(x: number = 0, y: number = 0, width: number = this.canvasWidth, height: number = this.canvasHeight) {
@@ -91,19 +91,13 @@ var app = {
   },
 
   update() {
+    for (var i = 0; i < this.snake.coords.length; i++) {
+      var coords = this.snake.coords[i];
+      let _renderedPointMeta = this.renderPoint(coords);
 
-    // intentionality being if the graph
-    // has already been rendered stop rendering
-    // if(this._didRenderPoint) { return; }
-
-    // intentionality being if the canvas has 
-    // already clear the designated region the stop 
-    // waisting cycles on clearing it 
-    // if(this._didCanvasClear) { return; }
-
-    let _renderedPointMeta = this.renderPoint(this.renderedPointMeta);
-    this.renderedPointMeta = this.updateRenderedPoint(_renderedPointMeta);
-    this.clearCanvas(_renderedPointMeta.x, _renderedPointMeta.y, _renderedPointMeta.width, _renderedPointMeta.height);
+      this.renderedPointMeta = this.updateRenderedPoint(_renderedPointMeta);
+      this.clearCanvas(_renderedPointMeta.x, _renderedPointMeta.y, _renderedPointMeta.width, _renderedPointMeta.height);      
+    }
 
     window.requestAnimationFrame(this.update.bind(this));
   }
