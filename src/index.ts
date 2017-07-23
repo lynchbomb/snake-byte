@@ -1,10 +1,5 @@
-interface IRenderedPointMeta {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  fillStyle: string;
-}
+import Snake from './snake';
+import ICoords from './snake';
 
 var app = {
 
@@ -13,25 +8,54 @@ var app = {
   canvasContext: <object> {},
   canvasWidth: <number> 0,
   canvasHeight: <number> 0,
+  snake: Snake,
 
   _didRenderPoint: <boolean> false,
   _didCanvasClear: <boolean> false,
 
-  // TODO convert to class
-  renderedPointMeta: {
-    x: 0,
-    y: 0, 
-    width: 1,
-    height: 1, 
-    fillStyle: '#000'
-  },
-
   init() {
     this.initCanvas();
+    this.initEvents();
     this.update();
+    this.snake = new Snake({
+      fillStyle: '#222'
+    });
   },
 
-  initCanvas(fillStyle: string = '#fff') {
+  initEvents() {
+    const scope = this;
+
+    document.addEventListener('keypress', (e) => {
+      switch (e.keyCode) {
+        case 37: scope.handleLeftArrow()
+          break;      
+        case 38: scope.handleUpArrow()
+          break;      
+        case 39: scope.handleRightArrow()
+          break;      
+        case 40: scope.handleDownArrow()
+          break;      
+      }
+    });
+  },
+
+  handleLeftArrow() {
+    this.snake.heading = 0;
+  },
+
+  handleUpArrow() {
+    this.snake.heading = 1;
+  },
+
+  handleRightArrow() {
+    this.snake.heading = 2;
+  },
+
+  handleDownArrow() {
+    this.snake.heading = 3;
+  },
+
+  initCanvas(fillStyle: string = '#000') {
     this.canvasContext = this.$canvas.getContext('2d');
     this.canvasWidth = this.$canvas.width;
     this.canvasHeight = this.$canvas.height;
@@ -48,18 +72,22 @@ var app = {
     return true;
 	},
 
-  renderPoint(renderedPointMeta: IRenderedPointMeta) {
-    this.canvasContext.fillStyle = renderedPointMeta.fillStyle;
-    this.canvasContext.fillRect(renderedPointMeta.x, renderedPointMeta.y, renderedPointMeta.width, renderedPointMeta.height);
+  renderPoint(renderedPoint: ICoords) {
+    this.canvasContext.fillStyle = this.snake.fillStyle;
+    this.canvasContext.fillRect(renderedPoint.x, renderedPoint.y, this.snake.width, this.snake.height);
 
-    return renderedPointMeta;
+    return renderedPoint;
   },
 
-  updateRenderedPoint(renderedPointMeta: IRenderedPointMeta) {    
-    renderedPointMeta.x++;
-    renderedPointMeta.y++;
+  updateRenderedPoint(renderedPoint: ICoords) {    
+    renderedPoint.x++;
+    renderedPoint.y++;
 
-    return renderedPointMeta;
+    return renderedPoint;
+  },
+
+  eat() {
+
   },
 
   update() {
