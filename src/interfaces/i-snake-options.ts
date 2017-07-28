@@ -1,4 +1,5 @@
 import { HEADING } from '../heading';
+import ICoords from './i-coords';
 
 export default interface ISnakeOptions {
   heading?: HEADING;
@@ -6,4 +7,5 @@ export default interface ISnakeOptions {
   origin?: object;
   fillStyle?: string;
   lives?: number;
+  coords?: Array<ICoords>;
 }
