@@ -1,1 +1,2 @@
-import './pause-resume-test';
+// import './pause-resume-test';
+import './super-test';

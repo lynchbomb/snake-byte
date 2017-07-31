@@ -1,115 +1,111 @@
-import Snake from './snake';
 import ICoords from './interfaces/i-coords';
+import ISnakeOptions from './interfaces/i-snake-options';
+import Snake from './snake';
 
-var app = {
-  
-  $canvas: <object> document.getElementById('canvas'),
-  canvasContext: <object> {},
-  canvasWidth: <number> 0,
-  canvasHeight: <number> 0,
+export default class SnakeByte {
 
-  snake: Snake,
+  public snake = <Snake> {};
+  public $canvas = <HTMLCanvasElement> document.getElementById('canvas');
+  public canvasContext = <CanvasRenderingContext2D> this.$canvas.getContext('2d');
+  public canvasWidth = <number> 0;
+  public canvasHeight = <number> 0;
 
-  init() {
+  public someNum = 1;
+
+  constructor() {
     this.initCanvas('#000');
     this.snake = new Snake({
       fillStyle: 'green',
-      origin: [{x:this.canvasWidth / 2, y:this.canvasHeight / 2}]
+      origin: [{x: this.canvasWidth / 2, y: this.canvasHeight / 2}]
     });
     this.eventController();
     this.update();
-  },
+  }
 
-  initCanvas(fillStyle: string = '#000') {
-    this.canvasContext = this.$canvas.getContext('2d');
+  public initCanvas(fillStyle: string = '#000') {
     this.canvasWidth = this.$canvas.width;
     this.canvasHeight = this.$canvas.height;
     this.canvasContext.fillStyle = fillStyle;
     this.canvasContext.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-  },
+  }
 
-  eventController() {
+  public eventController() {
     document.addEventListener('keydown', this.handleKeydown.bind(this));
-  },
+  }
 
-  handleKeydown(e: any) {
+  public handleKeydown(e: any) {
     switch (e.keyCode) {
-      case 37: this.handleLeftArrow()
-        break;      
-      case 38: this.handleUpArrow()
-        break;      
-      case 39: this.handleRightArrow()
-        break;      
-      case 40: this.handleDownArrow()
-        break;      
+      case 37: this.handleLeftArrow();
+        break;
+      case 38: this.handleUpArrow();
+        break;
+      case 39: this.handleRightArrow();
+        break;
+      case 40: this.handleDownArrow();
+        break;
+      default: return;
     }
-  },
+  }
 
-  handleLeftArrow() {
+  public handleLeftArrow() {
     this.snake.heading = 0;
-    console.log(0);
-  },
+  }
 
-  handleUpArrow() {
+  public handleUpArrow() {
     this.snake.heading = 1;
-    console.log(1);
-  },
+  }
 
-  handleRightArrow() {
+  public handleRightArrow() {
     this.snake.heading = 2;
-    console.log(this.snake.coords[0]);
 
     // throw-away
     this.snake.incrementDirection('right');
-  },
+  }
 
-  handleDownArrow() {
+  public handleDownArrow() {
     this.snake.heading = 3;
-    console.log(3);
-  },
+  }
 
-  clearCanvas(x: number = 0, y: number = 0, width: number = this.canvasWidth, height: number = this.canvasHeight) {
+  public clearCanvas(x: number = 0, y: number = 0, width: number = this.canvasWidth, height: number = this.canvasHeight) {
 		// instead of clearing the entire canvas
     // just pass the object/proto to be cleared
     // default is the clear the entire canvas
     this.canvasContext.clearRect(x, y, width, height);
 
     return true;
-	},
+  }
 
-  renderPoint(renderedPoint: ICoords) {
+  public renderPoint(renderedPoint: ICoords) {
     this.canvasContext.fillStyle = this.snake.fillStyle;
     // fill a point that is {x:0,y:0, 1, 1}
     this.canvasContext.fillRect(renderedPoint.x, renderedPoint.y, this.snake.width, this.snake.height);
 
     return renderedPoint;
-  },
+  }
 
   // TODO: prob delete this method
-  updateRenderedPoint(renderedPoint: ICoords) {    
+  public updateRenderedPoint(renderedPoint: ICoords) {
     renderedPoint.x++;
     renderedPoint.y++;
 
     return renderedPoint;
-  },
+  }
 
-  eat() {
+  public eat() {
 
-  },
+  }
 
-  update() {
-    for (var i = 0; i < this.snake.coords.length; i++) {
+  public update() {
+    for (let i = 0; i < this.snake.coords.length; i++) {
       // {x:0, y:0}
-      var coords = this.snake.coords[i];
+      let coords = this.snake.coords[i];
       // point above is rendered to canvas
       let _renderedPointMeta = this.renderPoint(coords);
 
       // this.renderedPointMeta = this.updateRenderedPoint(_renderedPointMeta);
-      // this.clearCanvas(_renderedPointMeta.x, _renderedPointMeta.y, _renderedPointMeta.width, _renderedPointMeta.height);      
+      // this.clearCanvas(_renderedPointMeta.x, _renderedPointMeta.y, _renderedPointMeta.width, _renderedPointMeta.height);
     }
 
     window.requestAnimationFrame(this.update.bind(this));
   }
-}
-
-app.init();
+};

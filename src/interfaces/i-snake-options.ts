@@ -7,5 +7,5 @@ export default interface ISnakeOptions {
   origin?: object;
   fillStyle?: string;
   lives?: number;
-  coords?: Array<ICoords>;
-}
+  coords?: ICoords[];
+};

@@ -1,5 +1,9 @@
-QUnit.module('tests/pause-resume-test');
+import SnakeByte from 'snake-byte';
 
-QUnit.test('basic', function(assert) {
-  assert.equal(1, 1, 'They are the same 1 === 1');
+QUnit.module('tests/canvas-util');
+
+QUnit.test('clearCanvas', function(assert) {
+  let game = new SnakeByte();
+
+  assert.equal(game.someNum, 1, 'They are the same 1 === 1');
 });
