@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "es2015",
+    "module": "amd",
     "moduleResolution": "node",
     "target": "es2015",
     "declaration": true,
@@ -10,14 +10,22 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "noEmit": true,
+    "baseUrl": ".",
     "lib": [
       "es2015",
       "dom"
     ],
+    "paths": {
+      "snake-byte": ["src/index.ts"]
+    },
     "rootDir": "src"
   },
   "include": [
     "src/**/*.ts",
     "src/index.ts"
+  ],
+  "files": [
+    "src/index.ts",
+    "tests/index.ts"
   ]
 }

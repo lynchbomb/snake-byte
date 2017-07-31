@@ -1,53 +1,109 @@
-var Buffer = require('buffer').Buffer;
-var path = require('path');
-var Rollup = require('broccoli-rollup');
-var Funnel = require('broccoli-funnel');
-var MergeTrees = require('broccoli-merge-trees');
-var typescript = require('broccoli-typescript-compiler').typescript;
-var buble = require('rollup-plugin-buble');
-var fs = require('fs');
+const MergeTrees = require('broccoli-merge-trees');
+const Funnel = require('broccoli-funnel');
+const Rollup = require('broccoli-rollup');
+const path = require('path');
+const typescript = require('broccoli-typescript-compiler').typescript;
+const buble = require('rollup-plugin-buble');
+const fs = require('fs');
 
-var SOURCE_MAPPING_DATA_URL = '//# sourceMap';
-SOURCE_MAPPING_DATA_URL += 'pingURL=data:application/json;base64,';
+const SOURCE_MAPPING_DATA_URL = '//# sourceMap' + 'pingURL=data:application/json;base64,';
 
 module.exports = function () {
-  var types = new Funnel(path.dirname(require.resolve('typescript/lib/lib.d.ts')), {
-    include: ["lib*.d.ts"]
-  });
-  var src = new MergeTrees([types, "src"]);
-  var index = typescript(src, {
-    annotation: 'compile index.ts',
+  const src = new MergeTrees([
+    new Funnel(path.dirname(require.resolve('@types/qunit/package')), {
+      destDir: 'qunit',
+      include: [ 'index.d.ts' ]
+    }),
+    new Funnel(__dirname + '/src', {
+      destDir: 'src'
+    }),
+    new Funnel(__dirname + '/tests', {
+      destDir: 'tests'
+    })
+  ]);
+
+  const compiled = typescript(src, {
     tsconfig: {
       compilerOptions: {
-        module: "es2015",
-        moduleResolution: "node",
-        target: "es2015",
-        declaration: true,
-        strictNullChecks: true,
+        baseUrl: '.',
         inlineSourceMap: true,
-        inlineSources: true
+        inlineSources: true,
+        module: 'es2015',
+        moduleResolution: 'node',
+        paths: {
+          snakeByte: ['src/index.ts']
+        },
+        strictNullChecks: true,
+        target: 'es2015'
       },
-      files: [
-        "lib.es2015.d.ts",
-        "lib.dom.d.ts",
-        "index.ts"
-      ]
+      files: ['qunit/index.d.ts', 'src/index.ts', 'tests/index.ts']
     }
   });
+
+  const snakeByte = new Rollup(compiled, {
+    rollup: {
+      dest: 'es6/snake-byte.js',
+      entry: 'src/index.js',
+      format: 'es',
+      plugins: [
+        loadWithInlineMap()
+      ],
+      sourceMap: true
+    }
+  });
+
   return new MergeTrees([
-    new Funnel("src", {
-      include: ['index.html']
-    }),
-    new Rollup(index, {
-      annotation: 'index.js',
+    snakeByte,
+    new Rollup(compiled, {
       rollup: {
-        entry: 'index.js',
-        plugins: [ loadWithInlineMap(), buble() ],
+        entry: 'src/index.js',
+        plugins: [
+          loadWithInlineMap(),
+          buble()
+        ],
         sourceMap: true,
-        dest: 'index.js',
-        format: 'iife'
+        targets: [{
+          dest: 'named-amd/snake-byte.js',
+          exports: 'named',
+          format: 'amd',
+          moduleId: 'snakeByte',
+        }, {
+          dest: 'snake-byte.js',
+          format: 'cjs',
+        }]
       }
     }),
+    new Rollup(compiled, {
+      annotation: 'named-amd/tests.js',
+      rollup: {
+        entry: 'tests/index.js',
+        external: ['snakeByte'],
+        plugins: [
+          loadWithInlineMap(),
+          buble()
+        ],
+        sourceMap: true,
+        targets: [{
+          dest: 'named-amd/tests.js',
+          format: 'amd',
+          moduleId: 'snake-byte-tests'
+        }]
+      }
+    }),
+    new Funnel(path.dirname(require.resolve('qunitjs')), {
+      annotation: 'tests/qunit.{js,css}',
+      destDir: 'tests',
+      files: ['qunit.css', 'qunit.js']
+    }),
+    new Funnel(path.dirname(require.resolve('loader.js')), {
+      annotation: 'tests/loader.js',
+      destDir: 'tests',
+      files: ['loader.js']
+    }),
+    new Funnel(__dirname + '/tests', {
+      destDir: 'tests',
+      files: ['index.html']
+    })
   ], {
     annotation: 'dist'
   });
@@ -65,8 +121,9 @@ function loadWithInlineMap() {
       if (index === -1) {
         return result;
       }
-      result.code = code;
+      result.code = code.slice(0, index);
       result.map = parseSourceMap(code.slice(index + SOURCE_MAPPING_DATA_URL.length));
+      result.file = id;
       return result;
     }
   };
